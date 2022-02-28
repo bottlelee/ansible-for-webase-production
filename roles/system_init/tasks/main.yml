@@ -1,0 +1,8 @@
+- include_tasks: all.yml
+
+- include_tasks: "{{ task }}"
+  vars:
+    task: "{{ lookup('fileglob', role_path + '/tasks/' + group + '.yml*', wantlist=True) | first | default('skipped.yml') | basename }}"
+  loop: "{{ group_names }}"
+  loop_control:
+    loop_var: group

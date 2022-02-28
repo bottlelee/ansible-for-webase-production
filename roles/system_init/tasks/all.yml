@@ -1,0 +1,8 @@
+- name: Set timezone
+  timezone:
+    name: "{{ system.timezone }}"
+
+- name: Install some tools
+  package:
+    name: "{{ system.tools }}"
+    update_cache: true

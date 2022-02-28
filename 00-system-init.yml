@@ -1,0 +1,8 @@
+- hosts: all
+  become: true
+  # module_defaults:
+  #   pip:
+  #     extra_args: -i https://mirrors.tencent.com/pypi/simple
+  roles:
+    - system_init
+    - docker

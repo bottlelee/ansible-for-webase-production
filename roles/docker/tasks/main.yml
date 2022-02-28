@@ -1,0 +1,50 @@
+- block:
+    - name: Check docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+  rescue:
+
+    - name: Prevent docker service to started during install
+      systemd:
+        name: docker
+        masked: true
+
+    - include_tasks: "{{ ansible_os_family }}.yml"
+
+    - name: Un-masked docker service to started during install
+      systemd:
+        name: docker
+        masked: false
+
+    - name: "Add user to group 'docker'"
+      when: ansible_user != 'root'
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: "Ensure {{ (ansible_python.version.major == 2) | ternary('python-pip', 'python' + (ansible_python.version.major|string) + '-pip') }} is installed"
+      package:
+        name: "{{ (ansible_python.version.major == 2) | ternary('python-pip', 'python' + (ansible_python.version.major|string) + '-pip') }}"
+        update_cache: yes
+
+    - name: Install python docker module
+      pip:
+        name: docker
+
+- name: "Create docker lib path on '{{ docker.data_root }}'"
+  file:
+    path: "{{ docker.data_root }}"
+    state: directory
+  when: "docker.data_root != '/var/lib/docker'"
+
+- name: Config docker daemon
+  template:
+    src: "{{ item }}"
+    dest: /etc/docker/daemon.json
+  with_first_found:
+    - "{{ inventory_dir }}/templates/docker-daemon.json.j2"
+    - "docker-daemon.json.j2"
+  notify: Restart docker

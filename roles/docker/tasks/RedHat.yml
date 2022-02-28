@@ -1,0 +1,14 @@
+- name: Download get-docker.sh
+  get_url:
+    url: https://get.docker.com
+    dest: /tmp/get-docker.sh
+
+- name: Install docker
+  shell: sh get-docker.sh --mirror Aliyun || sh get-docker.sh --mirror AzureChinaCloud || sh get-docker.sh
+  changed_when: false
+  args:
+    chdir: /tmp
+  register: __install_st
+  until: __install_st is succeeded
+  retries: 10
+  delay: 30

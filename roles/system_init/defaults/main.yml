@@ -1,0 +1,8 @@
+system:
+  timezone: 'Asia/Shanghai'
+  tools:
+    - byobu
+    - htop
+    - wget
+    - unzip
+    - software-properties-common
